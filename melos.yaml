@@ -1,0 +1,32 @@
+name: event_sdk
+repository: https://github.com/PranavBlob/flutter_blob_events
+
+packages:
+  - packages/*
+  - examples/*
+
+command:
+  bootstrap:
+    environment:
+      sdk: ^3.10.0
+      flutter: ">=3.38.0"
+
+scripts:
+  analyze:
+    run: dart analyze . --fatal-infos
+    exec:
+      concurrency: 1
+    description: Run analyzer across all packages.
+
+  test:
+    run: dart test
+    exec:
+      concurrency: 1
+      failFast: true
+    packageFilters:
+      dirExists: test
+    description: Run unit tests.
+
+  format:
+    run: dart format .
+    description: Format all Dart files.

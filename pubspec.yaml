@@ -1,0 +1,17 @@
+name: event_sdk_workspace
+description: Melos workspace for the Event SDK (Approach B).
+publish_to: none
+environment:
+  sdk: ^3.10.0
+
+workspace:
+  - packages/event_sdk
+  - packages/event_sdk_aws
+  - packages/event_sdk_adjust
+  - packages/event_sdk_firebase
+  - packages/event_sdk_amplitude
+  - packages/event_sdk_cli
+  - examples/event_sdk_example
+
+dev_dependencies:
+  melos: ^7.0.0

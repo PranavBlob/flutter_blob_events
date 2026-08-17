@@ -1,0 +1,24 @@
+name: event_sdk_aws
+description: Amazon Pinpoint adapter for event_sdk (via Amplify Analytics).
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+  flutter: ">=3.38.0"
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  event_sdk: 0.1.0
+  amplify_flutter: ^2.6.0
+  amplify_analytics_pinpoint: ^2.6.0
+  amplify_auth_cognito: ^2.6.0
+  amplify_core: ^2.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

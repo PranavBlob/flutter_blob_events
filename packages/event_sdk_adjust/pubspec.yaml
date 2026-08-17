@@ -1,0 +1,21 @@
+name: event_sdk_adjust
+description: Adjust adapter for event_sdk.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+  flutter: ">=3.38.0"
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  event_sdk: 0.1.0
+  adjust_sdk: ^5.7.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

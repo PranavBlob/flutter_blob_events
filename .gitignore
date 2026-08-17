@@ -1,0 +1,136 @@
+# =========================
+# Dart / Flutter (monorepo)
+# =========================
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.flutter-plugins
+.flutter-plugins-dependencies
+*.dart.js
+*.js_
+*.js.deps
+*.js.map
+*.info.json
+coverage/
+.test_coverage.dart
+
+# =========================
+# Melos
+# =========================
+.melos_tool/
+**/pubspec_overrides.yaml
+
+# =========================
+# FVM / Mason / local tooling
+# =========================
+.fvm/
+.fvmrc
+.mason/
+
+# =========================
+# Local env / secrets
+# =========================
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.keystore
+**/android/key.properties
+**/google-services.json
+**/GoogleService-Info.plist
+credentials.json
+service-account*.json
+
+# =========================
+# IDE / editors
+# =========================
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json.example
+*.swp
+*.swo
+*~
+
+# =========================
+# OS
+# =========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# =========================
+# Android (packages / apps)
+# =========================
+**/android/.gradle/
+**/android/captures/
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/**/GeneratedPluginRegistrant.kt
+*.jks
+*.apk
+*.aab
+
+# =========================
+# iOS / macOS
+# =========================
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/*sync/
+**/ios/**/DerivedData/
+**/ios/**/Pods/
+**/ios/**/.symlinks/
+**/ios/**/profile
+**/ios/**/xcuserdata
+**/ios/.generated/
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral/
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+
+**/macos/Flutter/ephemeral/
+**/macos/Pods/
+**/macos/**/xcuserdata
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# =========================
+# Linux / Windows / Web
+# =========================
+**/linux/flutter/ephemeral/
+**/windows/flutter/ephemeral/
+
+# =========================
+# Logs / temp / misc
+# =========================
+*.log
+*.tmp
+*.temp
+*.bak
+.cache/
+tmp/
+temp/
+node_modules/
