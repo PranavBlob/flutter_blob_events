@@ -11,7 +11,14 @@ class EventSdk {
   static final Map<EventPlatform, EventAdapter> _adapters = {};
   static final Set<EventPlatform> _disabled = {};
   static EventSdkConfig _config = const EventSdkConfig();
+  static Map<String, Object?> _defaultParams = {};
   static bool _initialized = false;
+
+  /// Default key/value pairs merged into every [track] call.
+  ///
+  /// Per-event props override keys with the same name.
+  static Map<String, Object?> get defaultParams =>
+      Map.unmodifiable(_defaultParams);
 
   static bool get isInitialized => _initialized;
 
@@ -41,6 +48,7 @@ class EventSdk {
     }
 
     _config = config;
+    _defaultParams = Map<String, Object?>.from(config.defaultParams);
     _adapters
       ..clear()
       ..addEntries(adapters.map((a) => MapEntry(a.platform, a)));
@@ -64,6 +72,44 @@ class EventSdk {
     _disabled.add(platform);
   }
 
+  /// Replaces all default params merged into every [track] call.
+  static void setDefaultParams(Map<String, Object?> params) {
+    _ensureInitialized();
+    _defaultParams = Map<String, Object?>.from(params);
+  }
+
+  /// Sets or updates a single default param for all platforms.
+  ///
+  /// Pass `null` to remove [key].
+  static void setDefaultParam(String key, Object? value) {
+    _ensureInitialized();
+    if (value == null) {
+      _defaultParams.remove(key);
+    } else {
+      _defaultParams[key] = value;
+    }
+  }
+
+  /// Merges [params] into existing default params (later keys win).
+  static void updateDefaultParams(Map<String, Object?> params) {
+    _ensureInitialized();
+    _defaultParams.addAll(params);
+  }
+
+  /// Removes default params by key.
+  static void removeDefaultParams(Iterable<String> keys) {
+    _ensureInitialized();
+    for (final key in keys) {
+      _defaultParams.remove(key);
+    }
+  }
+
+  /// Clears every default param.
+  static void clearDefaultParams() {
+    _ensureInitialized();
+    _defaultParams.clear();
+  }
+
   static Future<void> track(
     String name, {
     Map<String, Object?> props = const {},
@@ -80,9 +126,10 @@ class EventSdk {
     }
 
     final targets = _resolveTargets(exclude: exclude, only: only);
+    final mergedProps = _mergeTrackProps(props);
     final event = Event(
       name: name,
-      props: Map.unmodifiable(props),
+      props: Map.unmodifiable(mergedProps),
       timestamp: timestamp ?? DateTime.now().toUtc(),
     );
 
@@ -133,7 +180,14 @@ class EventSdk {
     _adapters.clear();
     _disabled.clear();
     _config = const EventSdkConfig();
+    _defaultParams = {};
     _initialized = false;
+  }
+
+  static Map<String, Object?> _mergeTrackProps(Map<String, Object?> props) {
+    if (_defaultParams.isEmpty) return props;
+    if (props.isEmpty) return Map<String, Object?>.from(_defaultParams);
+    return {..._defaultParams, ...props};
   }
 
   static List<EventPlatform> _resolveTargets({

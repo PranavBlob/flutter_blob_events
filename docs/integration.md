@@ -27,6 +27,13 @@ dependencies:
       path: packages/event_sdk_aws
       ref: event_sdk
 
+  # Or HTTP endpoint (Atom/custom API) instead of Pinpoint:
+  aws_endpoint_sdk:
+    git:
+      url: https://github.com/PranavBlob/flutter_blob_events.git
+      path: packages/aws_endpoint_sdk
+      ref: event_sdk
+
   event_sdk_adjust:
     git:
       url: https://github.com/PranavBlob/flutter_blob_events.git
@@ -42,6 +49,8 @@ dependencies:
     path: ../flutter_blob_events/packages/event_sdk
   event_sdk_aws:
     path: ../flutter_blob_events/packages/event_sdk_aws
+  aws_endpoint_sdk:
+    path: ../flutter_blob_events/packages/aws_endpoint_sdk
   event_sdk_adjust:
     path: ../flutter_blob_events/packages/event_sdk_adjust
 ```
@@ -54,19 +63,29 @@ dependencies:
 import 'package:event_sdk/event_sdk.dart';
 import 'package:event_sdk_aws/event_sdk_aws.dart';
 import 'package:event_sdk_adjust/event_sdk_adjust.dart';
+// import 'package:aws_endpoint_sdk/aws_endpoint_sdk.dart'; // if using HTTP endpoint
+
+final eventSdkDefaultParams = <String, Object?>{
+  'source': 'mobile_app',
+  'env': 'dev',
+};
 
 Future<void> setupEventSdk() async {
-  await EventSdk.init([
-    AwsPinpointAdapter(
-      config: AwsPinpointConfig(amplifyConfig: amplifyconfig),
-    ),
-    AdjustAdapter(
-      config: AdjustEventConfig(
-        appToken: 'YOUR_TOKEN',
-        eventTokens: {'signup': 'abc123'},
+  await EventSdk.init(
+    [
+      AwsPinpointAdapter(
+        config: AwsPinpointConfig(amplifyConfig: amplifyconfig),
       ),
-    ),
-  ]);
+      // Or AwsEndpointAdapter(config: AwsEndpointConfig(endpoint: '...')),
+      AdjustAdapter(
+        config: AdjustEventConfig(
+          appToken: 'YOUR_TOKEN',
+          eventTokens: {'signup': 'abc123'},
+        ),
+      ),
+    ],
+    config: EventSdkConfig(defaultParams: eventSdkDefaultParams),
+  );
 }
 ```
 
@@ -95,22 +114,26 @@ From your Flutter app root:
 
 ```bash
 event_sdk init --platforms aws,adjust
+# or: event_sdk init --platforms aws_endpoint,adjust
 ```
 
 This will:
 
 1. Add `event_sdk` + selected platform packages to `pubspec.yaml` (git deps)
 2. Write `lib/generated/event_sdk_setup.g.dart`
-3. Create `lib/event_sdk_config.dart` for your vendor credentials
+3. Create `lib/event_sdk_config.dart` for vendor credentials **and**
+   `eventSdkDefaultParams` (sent to all platforms)
 
-Then fill real `AwsPinpointConfig` / `AdjustEventConfig` values in
-`lib/event_sdk_config.dart`. The CLI preserves this app-owned file when you
-add platforms later.
+Then fill real `AwsPinpointConfig` / `AwsEndpointConfig` / `AdjustEventConfig`
+values in `lib/event_sdk_config.dart`. The CLI preserves this app-owned file
+when you add platforms later. Change defaults at runtime with
+`EventSdk.setDefaultParam`.
 
 ### Add platforms later (same main SDK)
 
 ```bash
 event_sdk add --platforms firebase,amplitude
+# or: event_sdk add --platforms aws_endpoint
 ```
 
 The CLI adds both platform dependencies and regenerates the setup file. Initialize
@@ -150,7 +173,8 @@ await EventSdk.init([
 
 - [ ] Only needed platform packages in `pubspec.yaml`
 - [ ] `setupEventSdk()` / `EventSdk.init` called before `runApp`
-- [ ] Amplify config string set for Pinpoint
+- [ ] Amplify config string set for Pinpoint **or** HTTP endpoint URL for `aws_endpoint`
+- [ ] `eventSdkDefaultParams` filled in `event_sdk_config.dart` (optional but recommended)
 - [ ] Adjust `appToken` + `eventTokens` map filled
 - [ ] Feature modules import only `event_sdk`
 - [ ] Optional: `onAdapterError` hooked to your logger

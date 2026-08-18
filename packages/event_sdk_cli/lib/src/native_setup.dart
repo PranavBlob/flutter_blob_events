@@ -15,6 +15,7 @@ Future<void> ensureNativeRequirements({
   // All supported analytics adapters require network access.
   if (platformIds.intersection({
     'aws',
+    'aws_endpoint',
     'adjust',
     'firebase',
     'amplitude',

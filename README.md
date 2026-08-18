@@ -16,6 +16,7 @@ await EventSdk.track('signup', props: {'method': 'email'});
 | [Integration](docs/integration.md) | Manual git deps vs CLI |
 | [CLI](docs/cli.md) | `init` / `add` / `remove` / `list` |
 | [AWS Pinpoint](docs/platforms/aws_pinpoint.md) | Pinpoint / Amplify setup |
+| [AWS HTTP endpoint](docs/platforms/aws_endpoint.md) | Custom events API (`aws_endpoint_sdk`) |
 | [Adjust](docs/platforms/adjust.md) | Tokens, event map, sandbox |
 | [Architecture](docs/architecture.md) | Approach B, packages, routing |
 | [Decisions](docs/DECISIONS.md) | Locked product choices |
@@ -40,9 +41,10 @@ The CLI adds only the selected packages and creates:
 - `lib/generated/event_sdk_setup.g.dart` (generated)
 - `lib/event_sdk_config.dart` (your credentials/configuration)
 
-Fill the TODOs in `event_sdk_config.dart`, call `setupEventSdk()` in `main`,
+Fill the TODOs in `event_sdk_config.dart`, including `eventSdkDefaultParams`
+(sent with every event to all platforms). Call `setupEventSdk()` in `main`,
 then use `EventSdk.track(...)` anywhere. Run `event_sdk doctor` to check
-missing configuration.
+missing configuration. Change defaults later with `EventSdk.setDefaultParam`.
 
 ```dart
 import 'generated/event_sdk_setup.g.dart';
@@ -126,6 +128,12 @@ await EventSdk.track(
   'internal_metric',
   only: [EventPlatform.aws],
 );
+
+// Only AWS HTTP endpoint
+await EventSdk.track(
+  'mobile_tracking_event',
+  only: [EventPlatform.awsEndpoint],
+);
 ```
 
 ## Packages
@@ -134,6 +142,7 @@ await EventSdk.track(
 |---|---|---|
 | `event_sdk` | Core API + router | Ready |
 | `event_sdk_aws` | Amazon Pinpoint | Ready |
+| `aws_endpoint_sdk` | AWS HTTP events endpoint | Ready |
 | `event_sdk_adjust` | Adjust | Ready |
 | `event_sdk_cli` | Enable platforms via CLI | Ready (scaffold) |
 | `event_sdk_firebase` | Firebase Analytics | Ready |
@@ -144,7 +153,7 @@ await EventSdk.track(
 ```bash
 dart pub get
 dart test packages/event_sdk
-dart analyze packages/event_sdk packages/event_sdk_aws packages/event_sdk_adjust packages/event_sdk_cli
+dart analyze packages/event_sdk packages/event_sdk_aws packages/aws_endpoint_sdk packages/event_sdk_adjust packages/event_sdk_cli
 cd examples/event_sdk_example && flutter run
 ```
 

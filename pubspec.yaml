@@ -7,6 +7,7 @@ environment:
 workspace:
   - packages/event_sdk
   - packages/event_sdk_aws
+  - packages/aws_endpoint_sdk
   - packages/event_sdk_adjust
   - packages/event_sdk_firebase
   - packages/event_sdk_amplitude

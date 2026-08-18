@@ -31,6 +31,7 @@ await EventSdk.init(
   ],
   config: const EventSdkConfig(
     failSoft: true, // default: one adapter failure won't fail the whole track
+    defaultParams: {'source': 'mobile_app'},
   ),
 );
 ```
@@ -40,6 +41,50 @@ Rules:
 - At least one adapter required
 - Duplicate platforms rejected
 - Each adapter’s `init()` runs during SDK init
+
+---
+
+## Default params (all platforms)
+
+Key/value pairs merged into **every** `EventSdk.track` call **before** adapters
+run. AWS Pinpoint, AWS HTTP endpoint, Adjust, Firebase, and Amplitude all
+receive the same merged props.
+
+Per-event `props` override keys with the same name.
+
+### Edit in `lib/event_sdk_config.dart` (CLI apps)
+
+This file is app-owned. Add or change keys here; they apply to all platforms:
+
+```dart
+final eventSdkDefaultParams = <String, Object?>{
+  'source': 'mobile_app',
+  'env': 'dev',
+};
+
+EventSdkConfig createEventSdkConfig() => EventSdkConfig(
+  defaultParams: eventSdkDefaultParams,
+);
+```
+
+`setupEventSdk()` passes this into `EventSdk.init`.
+
+### At runtime (after login, plan change, etc.)
+
+```dart
+EventSdk.setDefaultParam('userId', 'user_123');
+EventSdk.setDefaultParam('userType', 'premium');
+EventSdk.updateDefaultParams({'plan': 'pro'});
+EventSdk.removeDefaultParams(['temp_flag']);
+EventSdk.setDefaultParam('userId', null); // removes the key
+```
+
+```dart
+await EventSdk.track('signup', props: {'method': 'email'});
+// every enabled platform receives: source, env, userId, userType, method
+```
+
+On `aws_endpoint_sdk`, merged props are sent in the HTTP `parameters` field.
 
 ---
 
@@ -171,6 +216,7 @@ EventSdkConfig(
 ```dart
 enum EventPlatform {
   aws,
+  awsEndpoint,
   adjust,
   firebase,
   amplitude,

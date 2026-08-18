@@ -29,6 +29,15 @@ const supportedPlatforms = <String, PlatformSpec>{
         'AwsPinpointAdapter(config: /* TODO: AwsPinpointConfig(...) */ throw UnimplementedError("Configure AwsPinpointConfig"))',
     available: true,
   ),
+  'aws_endpoint': PlatformSpec(
+    id: 'aws_endpoint',
+    packageName: 'aws_endpoint_sdk',
+    packagePath: 'packages/aws_endpoint_sdk',
+    importUri: 'package:aws_endpoint_sdk/aws_endpoint_sdk.dart',
+    adapterExpression:
+        'AwsEndpointAdapter(config: /* TODO: AwsEndpointConfig(...) */ throw UnimplementedError("Configure AwsEndpointConfig"))',
+    available: true,
+  ),
   'adjust': PlatformSpec(
     id: 'adjust',
     packageName: 'event_sdk_adjust',

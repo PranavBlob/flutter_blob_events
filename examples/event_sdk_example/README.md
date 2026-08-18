@@ -5,6 +5,12 @@ adapters through the shared `EventSdk` API.
 
 It uses **logging clients** by default, so events print to the console — no real AWS/Adjust credentials required.
 
+Default params (`source`, `env`) are set in `setupEventSdk()` and merged into
+every track for all adapters.
+
+For a custom HTTP events API (not Pinpoint), use `aws_endpoint_sdk` instead.
+See [AWS HTTP endpoint](../../docs/platforms/aws_endpoint.md).
+
 ## Run
 
 From the monorepo root:
@@ -47,6 +53,8 @@ See:
 
 - [Getting started](../../docs/getting_started.md)
 - [AWS Pinpoint](../../docs/platforms/aws_pinpoint.md)
+- [AWS HTTP endpoint](../../docs/platforms/aws_endpoint.md)
 - [Adjust](../../docs/platforms/adjust.md)
 - [Firebase](../../docs/platforms/firebase.md)
 - [Amplitude](../../docs/platforms/amplitude.md)
+- [Usage (default params)](../../docs/usage.md)

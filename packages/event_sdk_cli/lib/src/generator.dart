@@ -8,6 +8,7 @@ const setupRelativePath = 'lib/generated/event_sdk_setup.g.dart';
 const configRelativePath = 'lib/event_sdk_config.dart';
 const _importMarker = '// event_sdk_cli:imports';
 const _adapterMarker = '// event_sdk_cli:adapters';
+const _defaultParamsMarker = '// event_sdk_cli:default_params';
 
 Future<void> writeSetupFile({
   required String appRoot,
@@ -28,7 +29,10 @@ import '../event_sdk_config.dart';
 
 /// Call once from main() before runApp.
 Future<void> setupEventSdk() async {
-  await EventSdk.init(createEventSdkAdapters());
+  await EventSdk.init(
+    createEventSdkAdapters(),
+    config: createEventSdkConfig(),
+  );
 }
 ''';
 
@@ -47,6 +51,7 @@ Future<void> _writeOrUpdateConfigFile({
   }
 
   var content = await file.readAsString();
+  content = _ensureDefaultParamsSection(content);
   for (final platform in platforms) {
     final factoryName = _factoryName(platform.id);
     if (!content.contains('    $factoryName(),')) {
@@ -101,6 +106,12 @@ import 'package:event_sdk/event_sdk.dart';
 $_importMarker
 $imports
 
+${_defaultParamsBlock()}
+
+EventSdkConfig createEventSdkConfig() => EventSdkConfig(
+  defaultParams: eventSdkDefaultParams,
+);
+
 List<EventAdapter> createEventSdkAdapters() => [
 $_adapterMarker
 $adapterFactories
@@ -108,6 +119,49 @@ $adapterFactories
 
 ${factories.join('\n\n')}
 ''';
+}
+
+String _defaultParamsBlock() => '''
+/// Default key/value pairs sent with **every** [EventSdk.track] call
+/// to **all** enabled platforms (AWS, AWS endpoint, Adjust, Firebase, Amplitude).
+///
+/// Edit this map in source, then change values at runtime:
+/// `EventSdk.setDefaultParam('userId', 'user_123')`
+/// `EventSdk.updateDefaultParams({'userType': 'premium'})`
+$_defaultParamsMarker
+final eventSdkDefaultParams = <String, Object?>{
+  // 'source': 'mobile_app',
+  // 'env': 'dev',
+};
+''';
+
+String _ensureDefaultParamsSection(String content) {
+  if (content.contains('eventSdkDefaultParams')) {
+    if (!content.contains('createEventSdkConfig()')) {
+      content = content.replaceFirst(
+        'List<EventAdapter> createEventSdkAdapters()',
+        '''EventSdkConfig createEventSdkConfig() => EventSdkConfig(
+  defaultParams: eventSdkDefaultParams,
+);
+
+List<EventAdapter> createEventSdkAdapters()''',
+      );
+    }
+    return content;
+  }
+
+  final insertAt = content.indexOf('List<EventAdapter> createEventSdkAdapters()');
+  final block = '''
+${_defaultParamsBlock()}
+EventSdkConfig createEventSdkConfig() => EventSdkConfig(
+  defaultParams: eventSdkDefaultParams,
+);
+
+''';
+  if (insertAt == -1) {
+    return '$content\n$block';
+  }
+  return content.substring(0, insertAt) + block + content.substring(insertAt);
 }
 
 String _factoryName(String platform) =>
@@ -121,6 +175,29 @@ EventAdapter createAwsAdapter() => AwsPinpointAdapter(
   config: AwsPinpointConfig(
     // TODO: supply your Amplify / Pinpoint JSON configuration.
     amplifyConfig: 'REPLACE_WITH_AMPLIFY_CONFIGURATION',
+  ),
+);''';
+    case 'aws_endpoint':
+      return '''
+EventAdapter createAws_endpointAdapter() => AwsEndpointAdapter(
+  config: AwsEndpointConfig(
+    // TODO: replace with your analytics HTTP endpoint URL.
+    endpoint: 'REPLACE_WITH_AWS_ENDPOINT_URL',
+    defaultFields: AwsEndpointDefaultFields(
+      appName: 'REPLACE_WITH_APP_NAME',
+      platform: 'REPLACE_WITH_PLATFORM', // e.g. Android / iOS
+      appId: 'REPLACE_WITH_APP_ID',
+      deviceId: 'REPLACE_WITH_DEVICE_ID',
+      installId: 'REPLACE_WITH_INSTALL_ID',
+      userId: 'REPLACE_WITH_USER_ID',
+      appVersion: 'REPLACE_WITH_APP_VERSION',
+      appEnvironment: 'REPLACE_WITH_APP_ENVIRONMENT',
+      osVersion: 'REPLACE_WITH_OS_VERSION',
+      deviceModel: 'REPLACE_WITH_DEVICE_MODEL',
+      languageCode: 'REPLACE_WITH_LANGUAGE_CODE',
+      userType: 'REPLACE_WITH_USER_TYPE',
+      gaid: 'REPLACE_WITH_GAID',
+    ),
   ),
 );''';
     case 'adjust':

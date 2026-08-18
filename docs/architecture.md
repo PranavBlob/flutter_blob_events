@@ -13,8 +13,9 @@ EventSdk.track / identify / flush     ← packages/event_sdk
     ▼
 Router (enabled − exclude | only)
     │
-    ├── event_sdk_aws      (Pinpoint)
-    ├── event_sdk_adjust   (Adjust)
+    ├── event_sdk_aws          (Pinpoint)
+    ├── aws_endpoint_sdk       (HTTP events API)
+    ├── event_sdk_adjust       (Adjust)
     ├── event_sdk_firebase     (Firebase Analytics)
     └── event_sdk_amplitude    (Amplitude)
 ```
@@ -34,7 +35,10 @@ flutter_blob_events/
 ├── packages/
 │   ├── event_sdk/           # pure Dart core
 │   ├── event_sdk_aws/       # Flutter + Amplify Pinpoint
+│   ├── aws_endpoint_sdk/    # Flutter + HTTP MobileTrackingEvent
 │   ├── event_sdk_adjust/    # Flutter + Adjust
+│   ├── event_sdk_firebase/  # Flutter + Firebase Analytics
+│   ├── event_sdk_amplitude/ # Flutter + Amplitude
 │   └── event_sdk_cli/       # init/add/remove tooling
 ├── examples/
 │   └── event_sdk_example/
@@ -51,13 +55,15 @@ flutter_blob_events/
 | `EventAdapter` | Platform contract (`init` / `track` / …) |
 | `EventPlatform` | Enum id for routing |
 | `EventSdk` | Static facade + registry + router |
-| `EventSdkConfig` | failSoft + error hook |
+| `EventSdkConfig` | failSoft + error hook + defaultParams |
 
 ## Adapter contract
 
-Each platform package implements `EventAdapter` and exports a Dart config class (`AwsPinpointConfig`, `AdjustEventConfig`, …).
+Each platform package implements `EventAdapter` and exports a Dart config class (`AwsPinpointConfig`, `AwsEndpointConfig`, `AdjustEventConfig`, …).
 
-Optional client seams (`PinpointAnalyticsClient`, `AdjustClient`) allow logging/fakes in tests and the example app.
+Optional client seams (`PinpointAnalyticsClient`, `AwsEndpointClient`, `AdjustClient`) allow logging/fakes in tests and the example app.
+
+Default params live in the host app’s `lib/event_sdk_config.dart` (`eventSdkDefaultParams`) and are merged into every `track` for all enabled platforms.
 
 ## Distribution
 

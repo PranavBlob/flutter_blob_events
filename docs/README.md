@@ -11,6 +11,7 @@
 | [architecture.md](architecture.md) | Approach B design |
 | [DECISIONS.md](DECISIONS.md) | Locked product decisions |
 | [platforms/aws_pinpoint.md](platforms/aws_pinpoint.md) | Pinpoint adapter |
+| [platforms/aws_endpoint.md](platforms/aws_endpoint.md) | HTTP endpoint adapter |
 | [platforms/adjust.md](platforms/adjust.md) | Adjust adapter |
 | [platforms/firebase.md](platforms/firebase.md) | Firebase Analytics adapter |
 | [platforms/amplitude.md](platforms/amplitude.md) | Amplitude adapter |

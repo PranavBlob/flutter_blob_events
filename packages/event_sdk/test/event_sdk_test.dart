@@ -128,4 +128,66 @@ void main() {
       throwsA(isA<EventSdkException>()),
     );
   });
+
+  test('merges default params into every platform', () async {
+    final aws = _FakeAdapter(EventPlatform.aws);
+    final adjust = _FakeAdapter(EventPlatform.adjust);
+
+    await EventSdk.init(
+      [aws, adjust],
+      config: const EventSdkConfig(
+        defaultParams: {'source': 'app', 'env': 'dev'},
+      ),
+    );
+    await EventSdk.track('signup', props: {'method': 'email'});
+
+    final expected = {
+      'source': 'app',
+      'env': 'dev',
+      'method': 'email',
+    };
+    expect(aws.tracked.single.props, expected);
+    expect(adjust.tracked.single.props, expected);
+  });
+
+  test('track props override default params with same key', () async {
+    final aws = _FakeAdapter(EventPlatform.aws);
+
+    await EventSdk.init(
+      [aws],
+      config: const EventSdkConfig(defaultParams: {'env': 'dev'}),
+    );
+    await EventSdk.track('signup', props: {'env': 'prod'});
+
+    expect(aws.tracked.single.props['env'], 'prod');
+  });
+
+  test('setDefaultParam updates a key for later events', () async {
+    final aws = _FakeAdapter(EventPlatform.aws);
+    final firebase = _FakeAdapter(EventPlatform.firebase);
+
+    await EventSdk.init(
+      [aws, firebase],
+      config: const EventSdkConfig(defaultParams: {'userType': 'guest'}),
+    );
+    EventSdk.setDefaultParam('userId', 'user_123');
+    EventSdk.setDefaultParam('userType', 'premium');
+    await EventSdk.track('open');
+
+    expect(aws.tracked.single.props, {
+      'userType': 'premium',
+      'userId': 'user_123',
+    });
+    expect(firebase.tracked.single.props['userId'], 'user_123');
+  });
+
+  test('updateDefaultParams merges at runtime', () async {
+    final aws = _FakeAdapter(EventPlatform.aws);
+
+    await EventSdk.init([aws]);
+    EventSdk.updateDefaultParams({'userType': 'guest'});
+    await EventSdk.track('open');
+
+    expect(aws.tracked.single.props['userType'], 'guest');
+  });
 }

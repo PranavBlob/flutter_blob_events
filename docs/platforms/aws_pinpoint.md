@@ -2,6 +2,11 @@
 
 Sends events through **Amplify Analytics → Amazon Pinpoint**.
 
+If your backend is a custom REST URL (for example
+`https://dev-events.atomapplications.com/api/dev/v1`) instead of Pinpoint,
+use [`aws_endpoint_sdk`](aws_endpoint.md). Do not put that URL in
+`AwsPinpointConfig.amplifyConfig`.
+
 ## Dependency
 
 ```yaml

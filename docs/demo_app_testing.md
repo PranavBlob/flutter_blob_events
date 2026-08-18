@@ -25,7 +25,7 @@ End-to-end steps to test Event SDK in a **new Flutter app** using the CLI.
 - Git access to the repo above
 - Android emulator/device and/or iOS simulator/device
 - Vendor credentials (for real dashboard testing):
-  - AWS Pinpoint / Amplify config
+  - AWS Pinpoint / Amplify config **or** HTTP events URL (`aws_endpoint`)
   - Adjust app token + event tokens
   - Firebase project (if testing Firebase)
   - Amplitude API key (if testing Amplitude)
@@ -62,11 +62,20 @@ event_sdk list
 
 ## Step 3 — Initialize SDK in the demo app
 
-### Option A — Test all 4 platforms
+### Option A — Test all platforms (Pinpoint AWS)
 
 ```bash
 event_sdk init --platforms aws,adjust,firebase,amplitude
 ```
+
+### Option A2 — HTTP AWS endpoint (Atom/custom API)
+
+```bash
+event_sdk init --platforms aws_endpoint,adjust
+```
+
+Fill `REPLACE_WITH_AWS_ENDPOINT_URL` and device/user fields in
+`lib/event_sdk_config.dart`. See [AWS HTTP endpoint](platforms/aws_endpoint.md).
 
 ### Option B — Start with AWS + Adjust only (easier first test)
 
@@ -121,16 +130,23 @@ Replace all `REPLACE_WITH_*` placeholders.
 
 | Platform | What to fill |
 |---|---|
-| AWS | `AwsPinpointConfig.amplifyConfig` |
+| AWS (Pinpoint) | `AwsPinpointConfig.amplifyConfig` |
+| AWS (HTTP) | `AwsEndpointConfig.endpoint` + `AwsEndpointDefaultFields` |
 | Adjust | `appToken` + `eventTokens` map |
 | Amplitude | `AmplitudeConfig.apiKey` |
 | Firebase | No secret in config file (see Step 6) |
+| All platforms | `eventSdkDefaultParams` (merged into every `track`) |
 
 **Adjust note:** every event name you call via `EventSdk.track(...)` must exist in `eventTokens`.
+
+Add shared keys in `eventSdkDefaultParams` (for example `source`, `env`). They
+are merged into every `track` for **all** platforms. Change them later with
+`EventSdk.setDefaultParam('userId', 'user_123')`.
 
 Platform details:
 
 - [AWS Pinpoint](platforms/aws_pinpoint.md)
+- [AWS HTTP endpoint](platforms/aws_endpoint.md)
 - [Adjust](platforms/adjust.md)
 - [Firebase](platforms/firebase.md)
 - [Amplitude](platforms/amplitude.md)
@@ -441,6 +457,12 @@ Do not import Firebase init code until that file exists.
 - Confirm Amplify/Pinpoint config string is valid
 - Confirm Pinpoint analytics is enabled in Amplify backend
 
+### AWS HTTP endpoint events not appearing
+
+- Confirm `AwsEndpointConfig.endpoint` is the full URL (not Amplify JSON)
+- Confirm `AwsEndpointDefaultFields` (appId, deviceId, userId, …) are filled
+- Confirm `eventSdkDefaultParams` and per-event props land under `parameters`
+
 ### iOS build issues after adding plugins
 
 ```bash
@@ -462,6 +484,7 @@ flutter run
 - [ ] `event_sdk init` completed
 - [ ] `flutter pub get` succeeds
 - [ ] `lib/event_sdk_config.dart` placeholders filled
+- [ ] `eventSdkDefaultParams` set (optional)
 - [ ] Firebase configured (if enabled)
 - [ ] `event_sdk doctor` passes (or only expected warnings remain)
 - [ ] App runs on Android
@@ -475,6 +498,7 @@ flutter run
 ## Related docs
 
 - [CLI reference](cli.md)
+- [AWS HTTP endpoint](platforms/aws_endpoint.md)
 - [Getting started](getting_started.md)
 - [Usage & API](usage.md)
 - [Integration guide](integration.md)

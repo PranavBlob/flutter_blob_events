@@ -1,11 +1,16 @@
 # Getting started
 
-This guide gets Event SDK running in a Flutter app with **AWS Pinpoint** and **Adjust**.
+This guide gets Event SDK running in a Flutter app with **AWS** and **Adjust**.
+
+Use **Pinpoint** (`aws`) if you have Amplify config. Use the **HTTP endpoint**
+(`aws_endpoint`) if you send events to a REST URL such as
+`https://dev-events.atomapplications.com/api/dev/v1`. See
+[AWS HTTP endpoint](platforms/aws_endpoint.md).
 
 ## Prerequisites
 
 - Flutter 3.38+ / Dart 3.10+
-- An Amplify / Pinpoint analytics config (or plan to use logging clients first)
+- Either Amplify / Pinpoint config **or** a custom events HTTP endpoint
 - An Adjust app token + event tokens from the Adjust dashboard
 
 ## Step 1 — Add dependencies
@@ -38,7 +43,7 @@ flutter pub get
 ```
 
 > Prefer the one-command installer? See [cli.md](cli.md)
-> (`event_sdk init --platforms aws,adjust`).
+> (`event_sdk init --platforms aws,adjust` or `aws_endpoint,adjust`).
 
 ## Step 2 — Initialize via CLI (recommended)
 
@@ -62,17 +67,26 @@ flutter pub get
 
 Open `lib/event_sdk_config.dart` and replace the placeholders, e.g.
 - AWS Pinpoint: `AwsPinpointConfig.amplifyConfig`
+- AWS HTTP endpoint: `AwsEndpointConfig.endpoint` + `AwsEndpointDefaultFields`
 - Adjust: `AdjustEventConfig.appToken` and `eventTokens` map
+- Default params (all platforms): `eventSdkDefaultParams`
 
 After that, the generated `setupEventSdk()` calls:
 
 ```dart
-await EventSdk.init(createEventSdkAdapters());
+await EventSdk.init(
+  createEventSdkAdapters(),
+  config: createEventSdkConfig(),
+);
 ```
+
+Default params in `eventSdkDefaultParams` are merged into every `track` for
+**all** enabled platforms. Change them later with `EventSdk.setDefaultParam`.
 
 Platform details:
 
 - [AWS Pinpoint](platforms/aws_pinpoint.md)
+- [AWS HTTP endpoint](platforms/aws_endpoint.md)
 - [Adjust](platforms/adjust.md)
 
 ## Step 3 — Call setup from `main`
@@ -158,5 +172,6 @@ The example uses **logging clients** (prints to console) so you can exercise the
 ## Next
 
 - Full API: [usage.md](usage.md)
+- Custom AWS HTTP API: [platforms/aws_endpoint.md](platforms/aws_endpoint.md)
 - Add Firebase/Amplitude later: [cli.md](cli.md)
 - Architecture: [architecture.md](architecture.md)

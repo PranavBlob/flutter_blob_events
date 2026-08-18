@@ -39,6 +39,10 @@ Future<void> setupEventSdk() async {
       ),
     ],
     config: EventSdkConfig(
+      defaultParams: {
+        'source': 'event_sdk_example',
+        'env': 'demo',
+      },
       onAdapterError: (error, stack) {
         // ignore: avoid_print
         print('EventSdk adapter error: $error');

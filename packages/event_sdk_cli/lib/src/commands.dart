@@ -122,6 +122,7 @@ Future<void> runDoctor({required String appRoot}) async {
   // Native checks (Android + iOS).
   if (enabledPlatforms.intersection({
     'aws',
+    'aws_endpoint',
     'adjust',
     'firebase',
     'amplitude',
