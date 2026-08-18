@@ -75,7 +75,7 @@ AwsEndpointAdapter(
 Update metadata at runtime:
 
 ```dart
-final adapter = createAws_endpointAdapter() as AwsEndpointAdapter;
+final adapter = createAwsEndpointAdapter() as AwsEndpointAdapter;
 adapter.updateDefaultFields(
   AwsEndpointDefaultFields(deviceId: newDeviceId, userId: newUserId),
 );

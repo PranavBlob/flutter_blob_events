@@ -215,13 +215,15 @@ EventSdkConfig(
 
 ```dart
 enum EventPlatform {
-  aws,
-  awsEndpoint,
+  aws,          // Pinpoint — event_sdk_aws
+  awsEndpoint,  // HTTP events API — aws_endpoint_sdk
   adjust,
   firebase,
   amplitude,
 }
 ```
+
+`EventPlatform.aws` and `EventPlatform.awsEndpoint` are different platforms. Use `awsEndpoint` with `only` / `exclude` when you initialized `aws_endpoint_sdk`.
 
 ---
 

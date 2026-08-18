@@ -3,6 +3,7 @@
 | Doc | Description |
 |---|---|
 | [../README.md](../README.md) | Overview + quick start |
+| [../CHANGELOG.md](../CHANGELOG.md) | 0.1.0 release notes |
 | [demo_app_testing.md](demo_app_testing.md) | Full demo app test guide (CLI) |
 | [getting_started.md](getting_started.md) | First integration (AWS + Adjust) |
 | [usage.md](usage.md) | Full API examples |

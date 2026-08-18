@@ -16,7 +16,8 @@ Future<void> main(List<String> args) async {
       'platforms',
       abbr: 'p',
       splitCommas: true,
-      help: 'Platforms to enable (aws,adjust,firebase,amplitude).',
+      help:
+          'Platforms to enable (aws,aws_endpoint,adjust,firebase,amplitude).',
     )
     ..addOption(
       'git-url',
@@ -34,7 +35,7 @@ Future<void> main(List<String> args) async {
       'platforms',
       abbr: 'p',
       splitCommas: true,
-      help: 'Platforms to add.',
+      help: 'Platforms to add (aws,aws_endpoint,adjust,firebase,amplitude).',
     )
     ..addOption(
       'git-url',

@@ -1,3 +1,4 @@
+import 'package:aws_endpoint_sdk/aws_endpoint_sdk.dart';
 import 'package:event_sdk/event_sdk.dart';
 import 'package:event_sdk_adjust/event_sdk_adjust.dart';
 import 'package:event_sdk_amplitude/event_sdk_amplitude.dart';
@@ -8,6 +9,7 @@ import 'package:event_sdk_firebase/event_sdk_firebase.dart';
 ///
 /// For production, remove the custom clients and set:
 /// - [AwsPinpointConfig.amplifyConfig] + configureAmplify: true
+/// - [AwsEndpointConfig.endpoint] + default fields
 /// - [AdjustEventConfig.initSdk]: true with a real app token / event token map
 /// - Firebase initialization in the host app before [setupEventSdk]
 /// - [AmplitudeConfig.apiKey]
@@ -20,6 +22,17 @@ Future<void> setupEventSdk() async {
           configureAmplify: false,
         ),
         client: LoggingPinpointClient(),
+      ),
+      AwsEndpointAdapter(
+        config: const AwsEndpointConfig(
+          endpoint: 'https://example.invalid/api/dev/v1',
+          defaultFields: AwsEndpointDefaultFields(
+            appName: 'event_sdk_example',
+            platform: 'demo',
+            appId: 'com.example.event_sdk',
+          ),
+        ),
+        client: LoggingAwsEndpointClient(),
       ),
       AdjustAdapter(
         config: const AdjustEventConfig(

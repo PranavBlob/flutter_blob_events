@@ -459,6 +459,23 @@ Adjust should be removed from deps/config while other platforms remain.
 
 ## Troubleshooting
 
+### `EventPlatform.awsEndpoint` or `defaultParams` not found
+
+The analyzer is using an old cached `event_sdk`. Adapter packages now depend on
+the sibling `event_sdk` in this repo (so `awsEndpoint` and
+`EventSdkConfig.defaultParams` stay in sync). Refresh:
+
+```bash
+flutter pub upgrade
+dart pub global activate --source git \
+  https://github.com/PranavBlob/flutter_blob_events.git \
+  --git-path packages/event_sdk_cli \
+  --git-ref event_sdk
+```
+
+`EventPlatform.aws` is Pinpoint. The HTTP adapter is `EventPlatform.awsEndpoint`.
+The generated factory is `createAwsEndpointAdapter()` (not `createAws_endpointAdapter`).
+
 ### `event_sdk` command not found
 
 ```bash

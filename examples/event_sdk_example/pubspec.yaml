@@ -1,5 +1,5 @@
 name: event_sdk_example
-description: Example Flutter app for Event SDK (AWS Pinpoint + Adjust).
+description: Example Flutter app for Event SDK (Pinpoint, HTTP endpoint, Adjust, Firebase, Amplitude).
 publish_to: none
 version: 0.1.0+1
 
@@ -15,6 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   event_sdk: 0.1.0
   event_sdk_aws: 0.1.0
+  aws_endpoint_sdk: 0.1.0
   event_sdk_adjust: 0.1.0
   event_sdk_firebase: 0.1.0
   event_sdk_amplitude: 0.1.0

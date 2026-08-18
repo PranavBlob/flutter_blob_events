@@ -54,6 +54,14 @@ class _HomePageState extends State<_HomePage> {
     setState(() => _log.insert(0, 'tracked button_tap → only aws'));
   }
 
+  Future<void> _trackOnlyAwsEndpoint() async {
+    await EventSdk.track(
+      'button_tap',
+      only: [EventPlatform.awsEndpoint],
+    );
+    setState(() => _log.insert(0, 'tracked button_tap → only aws_endpoint'));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,7 +83,12 @@ class _HomePageState extends State<_HomePage> {
             const SizedBox(height: 8),
             OutlinedButton(
               onPressed: _trackOnlyAws,
-              child: const Text('Track (only AWS)'),
+              child: const Text('Track (only AWS Pinpoint)'),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton(
+              onPressed: _trackOnlyAwsEndpoint,
+              child: const Text('Track (only AWS HTTP)'),
             ),
             const SizedBox(height: 24),
             Text('Log', style: Theme.of(context).textTheme.titleMedium),

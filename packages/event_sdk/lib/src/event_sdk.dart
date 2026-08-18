@@ -172,6 +172,8 @@ class EventSdk {
     }
     _adapters.clear();
     _disabled.clear();
+    _config = const EventSdkConfig();
+    _defaultParams = {};
     _initialized = false;
   }
 

@@ -144,7 +144,7 @@ await EventSdk.track(
 | `event_sdk_aws` | Amazon Pinpoint | Ready |
 | `aws_endpoint_sdk` | AWS HTTP events endpoint | Ready |
 | `event_sdk_adjust` | Adjust | Ready |
-| `event_sdk_cli` | Enable platforms via CLI | Ready (scaffold) |
+| `event_sdk_cli` | Enable platforms via CLI | Ready |
 | `event_sdk_firebase` | Firebase Analytics | Ready |
 | `event_sdk_amplitude` | Amplitude | Ready |
 
@@ -152,11 +152,13 @@ await EventSdk.track(
 
 ```bash
 dart pub get
-dart test packages/event_sdk
+dart test packages/event_sdk packages/event_sdk_cli
 dart analyze packages/event_sdk packages/event_sdk_aws packages/aws_endpoint_sdk packages/event_sdk_adjust packages/event_sdk_cli
+flutter test packages/event_sdk_aws packages/aws_endpoint_sdk packages/event_sdk_adjust packages/event_sdk_firebase packages/event_sdk_amplitude
 cd examples/event_sdk_example && flutter run
 ```
 
 ## License
 
-Private / unpublished (`publish_to: none`). Distribute via git.
+Private / unpublished (`publish_to: none`). See [LICENSE](LICENSE).
+Distribute via git.

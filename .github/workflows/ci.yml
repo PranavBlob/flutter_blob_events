@@ -1,0 +1,35 @@
+# CI
+
+on:
+  push:
+    branches: [event_sdk, main]
+  pull_request:
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: dart pub get
+      - run: >
+          dart analyze
+          packages/event_sdk
+          packages/event_sdk_cli
+          packages/event_sdk_aws
+          packages/aws_endpoint_sdk
+          packages/event_sdk_adjust
+          packages/event_sdk_firebase
+          packages/event_sdk_amplitude
+          examples/event_sdk_example
+      - run: dart test packages/event_sdk packages/event_sdk_cli
+      - run: >
+          flutter test
+          packages/event_sdk_aws
+          packages/aws_endpoint_sdk
+          packages/event_sdk_adjust
+          packages/event_sdk_firebase
+          packages/event_sdk_amplitude

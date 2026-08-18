@@ -7,5 +7,7 @@ void main() {
     await tester.pumpWidget(const EventSdkExampleApp());
     expect(find.text('Event SDK'), findsOneWidget);
     expect(find.text('Track (all enabled)'), findsOneWidget);
+    expect(find.text('Track (only AWS Pinpoint)'), findsOneWidget);
+    expect(find.text('Track (only AWS HTTP)'), findsOneWidget);
   });
 }

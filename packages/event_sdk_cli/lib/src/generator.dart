@@ -51,6 +51,7 @@ Future<void> _writeOrUpdateConfigFile({
   }
 
   var content = await file.readAsString();
+  content = _migrateLegacyFactoryNames(content);
   content = _ensureDefaultParamsSection(content);
   for (final platform in platforms) {
     final factoryName = _factoryName(platform.id);
@@ -81,8 +82,13 @@ Future<void> removePlatformFromConfig({
   if (!file.existsSync()) return;
 
   var content = await file.readAsString();
+  content = _migrateLegacyFactoryNames(content);
   for (final id in platformIds) {
     content = content.replaceFirst('    ${_factoryName(id)}(),\n', '');
+    final legacy = _legacyFactoryName(id);
+    if (legacy != null) {
+      content = content.replaceFirst('    $legacy(),\n', '');
+    }
   }
   await file.writeAsString(content);
 }
@@ -164,14 +170,40 @@ EventSdkConfig createEventSdkConfig() => EventSdkConfig(
   return content.substring(0, insertAt) + block + content.substring(insertAt);
 }
 
-String _factoryName(String platform) =>
-    'create${platform[0].toUpperCase()}${platform.substring(1)}Adapter';
+String _pascalCase(String id) {
+  return id
+      .split(RegExp(r'[_-]+'))
+      .where((part) => part.isNotEmpty)
+      .map((part) => '${part[0].toUpperCase()}${part.substring(1)}')
+      .join();
+}
+
+/// `aws` → `createAwsAdapter`, `aws_endpoint` → `createAwsEndpointAdapter`.
+String _factoryName(String platform) => 'create${_pascalCase(platform)}Adapter';
+
+/// Older CLI versions emitted invalid identifiers like `createAws_endpointAdapter`.
+String? _legacyFactoryName(String platform) {
+  if (!platform.contains('_') && !platform.contains('-')) return null;
+  return 'create${platform[0].toUpperCase()}${platform.substring(1)}Adapter';
+}
+
+String _migrateLegacyFactoryNames(String content) {
+  for (final id in supportedPlatforms.keys) {
+    final legacy = _legacyFactoryName(id);
+    if (legacy == null) continue;
+    final current = _factoryName(id);
+    if (legacy != current) {
+      content = content.replaceAll(legacy, current);
+    }
+  }
+  return content;
+}
 
 String _factoryTemplate(String platform) {
   switch (platform) {
     case 'aws':
       return '''
-EventAdapter createAwsAdapter() => AwsPinpointAdapter(
+EventAdapter ${_factoryName(platform)}() => AwsPinpointAdapter(
   config: AwsPinpointConfig(
     // TODO: supply your Amplify / Pinpoint JSON configuration.
     amplifyConfig: 'REPLACE_WITH_AMPLIFY_CONFIGURATION',
@@ -179,7 +211,7 @@ EventAdapter createAwsAdapter() => AwsPinpointAdapter(
 );''';
     case 'aws_endpoint':
       return '''
-EventAdapter createAws_endpointAdapter() => AwsEndpointAdapter(
+EventAdapter ${_factoryName(platform)}() => AwsEndpointAdapter(
   config: AwsEndpointConfig(
     // TODO: replace with your analytics HTTP endpoint URL.
     endpoint: 'REPLACE_WITH_AWS_ENDPOINT_URL',
@@ -202,7 +234,7 @@ EventAdapter createAws_endpointAdapter() => AwsEndpointAdapter(
 );''';
     case 'adjust':
       return '''
-EventAdapter createAdjustAdapter() => AdjustAdapter(
+EventAdapter ${_factoryName(platform)}() => AdjustAdapter(
   config: AdjustEventConfig(
     // TODO: replace with your Adjust app token and event-token map.
     appToken: 'REPLACE_WITH_ADJUST_APP_TOKEN',
@@ -213,13 +245,13 @@ EventAdapter createAdjustAdapter() => AdjustAdapter(
 );''';
     case 'firebase':
       return '''
-EventAdapter createFirebaseAdapter() => FirebaseAnalyticsAdapter();
+EventAdapter ${_factoryName(platform)}() => FirebaseAnalyticsAdapter();
 
 // TODO: initialize Firebase in main() before setupEventSdk(). See
 // https://firebase.google.com/docs/flutter/setup for flutterfire configure.''';
     case 'amplitude':
       return '''
-EventAdapter createAmplitudeAdapter() => AmplitudeAdapter(
+EventAdapter ${_factoryName(platform)}() => AmplitudeAdapter(
   config: const AmplitudeConfig(
     // TODO: replace with your Amplitude project API key.
     apiKey: 'REPLACE_WITH_AMPLITUDE_API_KEY',
@@ -241,7 +273,10 @@ Future<Set<String>> readEnabledPlatforms(String appRoot) async {
   final adapterList = config.substring(adapterListStart, adapterListEnd);
   final enabled = <String>{};
   for (final id in supportedPlatforms.keys) {
-    if (adapterList.contains(_factoryName(id))) enabled.add(id);
+    final names = [_factoryName(id), ?_legacyFactoryName(id)];
+    if (names.any((name) => adapterList.contains(name))) {
+      enabled.add(id);
+    }
   }
   return enabled;
 }

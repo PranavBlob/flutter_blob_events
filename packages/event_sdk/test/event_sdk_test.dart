@@ -181,6 +181,21 @@ void main() {
     expect(firebase.tracked.single.props['userId'], 'user_123');
   });
 
+  test('routes only awsEndpoint separately from aws', () async {
+    final aws = _FakeAdapter(EventPlatform.aws);
+    final endpoint = _FakeAdapter(EventPlatform.awsEndpoint);
+
+    await EventSdk.init(
+      [aws, endpoint],
+      config: const EventSdkConfig(defaultParams: {'source': 'app'}),
+    );
+    await EventSdk.track('open', only: [EventPlatform.awsEndpoint]);
+
+    expect(aws.tracked, isEmpty);
+    expect(endpoint.tracked, hasLength(1));
+    expect(endpoint.tracked.single.props['source'], 'app');
+  });
+
   test('updateDefaultParams merges at runtime', () async {
     final aws = _FakeAdapter(EventPlatform.aws);
 

@@ -13,10 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
   event_sdk:
-    git:
-      url: https://github.com/PranavBlob/flutter_blob_events.git
-      path: packages/event_sdk
-      ref: event_sdk
+    path: ../event_sdk
 
 dev_dependencies:
   flutter_test:
