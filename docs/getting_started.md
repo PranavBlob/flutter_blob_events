@@ -40,49 +40,34 @@ flutter pub get
 > Prefer the one-command installer? See [cli.md](cli.md)
 > (`event_sdk init --platforms aws,adjust`).
 
-## Step 2 — Create a setup file
+## Step 2 — Initialize via CLI (recommended)
 
-Create `lib/generated/event_sdk_setup.g.dart` (CLI generates this path by default):
+From your Flutter app root:
+
+```bash
+event_sdk init --platforms aws,adjust
+```
+
+This creates:
+- `lib/generated/event_sdk_setup.g.dart` (generated — do not edit)
+- `lib/event_sdk_config.dart` (app-owned config — edit the TODOs)
+
+Then run:
+
+```bash
+flutter pub get
+```
+
+### Fill credentials (only manual step)
+
+Open `lib/event_sdk_config.dart` and replace the placeholders, e.g.
+- AWS Pinpoint: `AwsPinpointConfig.amplifyConfig`
+- Adjust: `AdjustEventConfig.appToken` and `eventTokens` map
+
+After that, the generated `setupEventSdk()` calls:
 
 ```dart
-import 'package:event_sdk/event_sdk.dart';
-import 'package:event_sdk_aws/event_sdk_aws.dart';
-import 'package:event_sdk_adjust/event_sdk_adjust.dart';
-
-// Import your Amplify config string, e.g.:
-// import 'amplifyconfiguration.dart';
-
-Future<void> setupEventSdk() async {
-  await EventSdk.init(
-    [
-      AwsPinpointAdapter(
-        config: AwsPinpointConfig(
-          amplifyConfig: amplifyconfig,
-          configureAmplify: true,
-          addAuthPlugin: true,
-        ),
-      ),
-      AdjustAdapter(
-        config: AdjustEventConfig(
-          appToken: 'YOUR_ADJUST_APP_TOKEN',
-          isProduction: false,
-          eventTokens: {
-            'app_open': 'TOKEN_1',
-            'signup': 'TOKEN_2',
-            'purchase': 'TOKEN_3',
-          },
-        ),
-      ),
-    ],
-    config: EventSdkConfig(
-      failSoft: true,
-      onAdapterError: (error, stack) {
-        // Hook your logger / Crashlytics here
-        // debugPrint('$error\n$stack');
-      },
-    ),
-  );
-}
+await EventSdk.init(createEventSdkAdapters());
 ```
 
 Platform details:
@@ -102,6 +87,11 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 ```
+
+## Manual setup (alternative: no CLI)
+
+If you don’t want to use the CLI, you can manually implement
+`setupEventSdk()` by calling `EventSdk.init([...adapters...])` in any file.
 
 ## Step 4 — Track events in features
 
