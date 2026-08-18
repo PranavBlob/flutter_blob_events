@@ -8,7 +8,8 @@ Future<void> main(List<String> args) async {
     ..addCommand('init')
     ..addCommand('add')
     ..addCommand('remove')
-    ..addCommand('list');
+    ..addCommand('list')
+    ..addCommand('doctor');
 
   parser.commands['init']!
     ..addMultiOption(
@@ -68,6 +69,7 @@ Usage:
   dart run event_sdk_cli add --platforms firebase,amplitude
   dart run event_sdk_cli remove --platforms adjust
   dart run event_sdk_cli list
+  dart run event_sdk_cli doctor
 ''');
     return;
   }
@@ -95,6 +97,8 @@ Usage:
       );
     case 'list':
       await runList(appRoot: appRoot);
+    case 'doctor':
+      await runDoctor(appRoot: appRoot);
     default:
       stderr.writeln('Unknown command: ${command.name}');
       exitCode = 64;

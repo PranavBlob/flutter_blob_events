@@ -65,11 +65,7 @@ void _ensureGitDep(
   editor.update(
     ['dependencies', packageName],
     {
-      'git': {
-        'url': gitUrl,
-        'path': packagePath,
-        'ref': ref,
-      },
+      'git': {'url': gitUrl, 'path': packagePath, 'ref': ref},
     },
   );
 }

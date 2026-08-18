@@ -22,7 +22,38 @@ await EventSdk.track('signup', props: {'method': 'email'});
 
 ## Quick start
 
-### 1. Add packages (git)
+### 1. Install with CLI (recommended)
+
+```bash
+dart pub global activate --source git \
+  https://github.com/PranavBlob/flutter_blob_events.git \
+  --git-path packages/event_sdk_cli \
+  --git-ref event_sdk
+
+# From your Flutter app root:
+event_sdk init --platforms aws,adjust
+```
+
+The CLI adds only the selected packages and creates:
+
+- `lib/generated/event_sdk_setup.g.dart` (generated)
+- `lib/event_sdk_config.dart` (your credentials/configuration)
+
+Fill the TODOs in `event_sdk_config.dart`, call `setupEventSdk()` in `main`,
+then use `EventSdk.track(...)` anywhere. Run `event_sdk doctor` to check
+missing configuration.
+
+```dart
+import 'generated/event_sdk_setup.g.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await setupEventSdk();
+  runApp(const MyApp());
+}
+```
+
+### Manual package setup (alternative)
 
 ```yaml
 dependencies:
@@ -45,7 +76,7 @@ dependencies:
 
 Replace the git URL/ref with your real remote when ready.
 
-### 2. Init once in `main`
+### Init manually in `main`
 
 ```dart
 import 'package:event_sdk/event_sdk.dart';

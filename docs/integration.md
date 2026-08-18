@@ -3,7 +3,7 @@
 Two ways to wire Event SDK into an app:
 
 1. **Manual** — edit `pubspec.yaml` + write setup yourself  
-2. **CLI** — generate deps + `lib/generated/event_sdk_setup.g.dart`
+2. **CLI (recommended)** — generate deps, setup, and app-owned config
 
 Both end with the same runtime API: `EventSdk.track(...)`.
 
@@ -94,23 +94,23 @@ await EventSdk.track('purchase', exclude: [EventPlatform.adjust]);
 From your Flutter app root:
 
 ```bash
-# From this monorepo while developing the CLI:
-dart run event_sdk_cli init --platforms aws,adjust \
-  --git-url https://github.com/PranavBlob/flutter_blob_events.git \
-  --ref event_sdk
+event_sdk init --platforms aws,adjust
 ```
 
 This will:
 
 1. Add `event_sdk` + selected platform packages to `pubspec.yaml` (git deps)
 2. Write `lib/generated/event_sdk_setup.g.dart`
+3. Create `lib/event_sdk_config.dart` for your vendor credentials
 
-Then replace the `UnimplementedError` config placeholders with real `AwsPinpointConfig` / `AdjustEventConfig` values.
+Then fill real `AwsPinpointConfig` / `AdjustEventConfig` values in
+`lib/event_sdk_config.dart`. The CLI preserves this app-owned file when you
+add platforms later.
 
 ### Add platforms later (same main SDK)
 
 ```bash
-dart run event_sdk_cli add --platforms firebase,amplitude
+event_sdk add --platforms firebase,amplitude
 ```
 
 The CLI adds both platform dependencies and regenerates the setup file. Initialize
@@ -120,7 +120,7 @@ Firebase in the host app before calling `setupEventSdk()`, then fill the generat
 ### Remove a platform
 
 ```bash
-dart run event_sdk_cli remove --platforms adjust
+event_sdk remove --platforms adjust
 ```
 
 Full CLI reference: [cli.md](cli.md).

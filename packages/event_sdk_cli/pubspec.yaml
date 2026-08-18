@@ -9,7 +9,8 @@ environment:
 resolution: workspace
 
 executables:
-  event_sdk_cli:
+  event_sdk: event_sdk_cli
+  event_sdk_cli: event_sdk_cli
 
 dependencies:
   args: ^2.7.0

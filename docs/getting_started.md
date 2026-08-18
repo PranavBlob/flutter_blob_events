@@ -37,7 +37,8 @@ Then:
 flutter pub get
 ```
 
-> Prefer CLI? See [cli.md](cli.md) (`event_sdk_cli init --platforms aws,adjust`).
+> Prefer the one-command installer? See [cli.md](cli.md)
+> (`event_sdk init --platforms aws,adjust`).
 
 ## Step 2 — Create a setup file
 
