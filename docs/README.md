@@ -3,6 +3,7 @@
 | Doc | Description |
 |---|---|
 | [../README.md](../README.md) | Overview + quick start |
+| [demo_app_testing.md](demo_app_testing.md) | Full demo app test guide (CLI) |
 | [getting_started.md](getting_started.md) | First integration (AWS + Adjust) |
 | [usage.md](usage.md) | Full API examples |
 | [integration.md](integration.md) | Manual git vs CLI |

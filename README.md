@@ -10,6 +10,7 @@ await EventSdk.track('signup', props: {'method': 'email'});
 
 | Doc | What’s inside |
 |---|---|
+| [Demo app testing](docs/demo_app_testing.md) | Full step-by-step test with new Flutter app |
 | [Getting started](docs/getting_started.md) | Install, configure AWS + Adjust, first event |
 | [Usage & API](docs/usage.md) | `track` / `exclude` / `only` / `identify` / enable-disable |
 | [Integration](docs/integration.md) | Manual git deps vs CLI |
