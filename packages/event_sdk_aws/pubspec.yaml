@@ -12,7 +12,11 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
-  event_sdk: 0.1.0
+  event_sdk:
+    git:
+      url: https://github.com/PranavBlob/flutter_blob_events.git
+      path: packages/event_sdk
+      ref: event_sdk
   amplify_flutter: ^2.6.0
   amplify_analytics_pinpoint: ^2.6.0
   amplify_auth_cognito: ^2.6.0

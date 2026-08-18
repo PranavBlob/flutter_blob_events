@@ -12,7 +12,11 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
-  event_sdk: 0.1.0
+  event_sdk:
+    git:
+      url: https://github.com/PranavBlob/flutter_blob_events.git
+      path: packages/event_sdk
+      ref: event_sdk
   adjust_sdk: ^5.7.1
 
 dev_dependencies:
