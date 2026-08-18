@@ -14,8 +14,9 @@ End-to-end steps to test Event SDK in a **new Flutter app** using the CLI.
 - Generated setup + app config files are created
 - Android/iOS native requirements are added automatically
 - SDK initializes and fires events
+- `eventSdkDefaultParams` merge into every `track`
 - `exclude` / `only` routing works
-- Optional: events appear in vendor dashboards
+- Optional: events appear in vendor dashboards / HTTP endpoint
 
 ---
 
@@ -52,11 +53,16 @@ dart pub global activate --source git \
 
 If `event_sdk` is not found, add Dart global bin to your PATH (often `~/.pub-cache/bin`) and open a new terminal.
 
+After pulling the latest `event_sdk` branch, re-run this activate command so CLI
+picks up `aws_endpoint` and default-params generation.
+
 Verify:
 
 ```bash
 event_sdk list
 ```
+
+You should see `aws`, `aws_endpoint`, `adjust`, `firebase`, `amplitude`.
 
 ---
 
@@ -87,9 +93,10 @@ The CLI will:
 
 1. Add git dependencies to `pubspec.yaml`
 2. Create `lib/generated/event_sdk_setup.g.dart` (generated — do not edit)
-3. Create `lib/event_sdk_config.dart` (your credentials — edit TODOs)
-4. Add Android `INTERNET` permission
-5. Add iOS `NSUserTrackingUsageDescription` when Adjust is enabled
+3. Create `lib/event_sdk_config.dart` (credentials + `eventSdkDefaultParams` — edit TODOs)
+4. Wire generated setup to call `createEventSdkConfig()` (default params for all platforms)
+5. Add Android `INTERNET` permission
+6. Add iOS `NSUserTrackingUsageDescription` when Adjust is enabled
 
 Then:
 
@@ -261,8 +268,22 @@ class TestPage extends StatelessWidget {
     await EventSdk.track(
       'screen_view',
       props: {'screen': 'home'},
+      // Use EventPlatform.awsEndpoint if you initialized with aws_endpoint.
       only: [EventPlatform.aws],
     );
+  }
+
+  Future<void> _trackOnlyAwsEndpoint() async {
+    await EventSdk.track(
+      'screen_view',
+      props: {'screen': 'home'},
+      only: [EventPlatform.awsEndpoint],
+    );
+  }
+
+  Future<void> _updateDefaultParams() async {
+    EventSdk.setDefaultParam('userId', 'user_123');
+    EventSdk.setDefaultParam('userType', 'premium');
   }
 
   Future<void> _trackExcludeAdjust() async {
@@ -289,7 +310,15 @@ class TestPage extends StatelessWidget {
         children: [
           ElevatedButton(onPressed: _trackSignup, child: const Text('Track Signup')),
           ElevatedButton(onPressed: _trackPurchase, child: const Text('Track Purchase')),
-          ElevatedButton(onPressed: _trackOnlyAws, child: const Text('Track Only AWS')),
+          ElevatedButton(onPressed: _trackOnlyAws, child: const Text('Track Only AWS Pinpoint')),
+          ElevatedButton(
+            onPressed: _trackOnlyAwsEndpoint,
+            child: const Text('Track Only AWS HTTP'),
+          ),
+          ElevatedButton(
+            onPressed: _updateDefaultParams,
+            child: const Text('Set Default Params'),
+          ),
           ElevatedButton(
             onPressed: _trackExcludeAdjust,
             child: const Text('Track Exclude Adjust'),
@@ -374,9 +403,11 @@ Tap all test buttons on iOS too.
 
 | Button | Expected |
 |---|---|
-| Track Signup | All enabled platforms receive event |
-| Track Purchase | All enabled platforms receive purchase props |
-| Track Only AWS | Only AWS/Pinpoint |
+| Track Signup | All enabled platforms receive event **plus** `eventSdkDefaultParams` |
+| Track Purchase | All enabled platforms receive purchase props + default params |
+| Track Only AWS Pinpoint | Only `EventPlatform.aws` (skip this if you used `aws_endpoint`) |
+| Track Only AWS HTTP | Only `EventPlatform.awsEndpoint` (skip this if you used Pinpoint `aws`) |
+| Set Default Params | Later tracks include `userId` / `userType` on **all** platforms |
 | Track Exclude Adjust | All except Adjust |
 | Identify User | User traits sent to enabled platforms |
 
@@ -387,6 +418,7 @@ Tap all test buttons on iOS too.
 Check each enabled vendor dashboard for your test events:
 
 - AWS Pinpoint: `signup`, `purchase`, `screen_view`
+- AWS HTTP endpoint: POST body with `ename` + `parameters` (includes default params)
 - Adjust: only mapped token events
 - Firebase: DebugView / Realtime
 - Amplitude: Live events stream
@@ -399,6 +431,8 @@ Start with AWS + Adjust, then add more without changing feature code:
 
 ```bash
 event_sdk add --platforms firebase,amplitude
+# or add the HTTP AWS adapter later:
+# event_sdk add --platforms aws_endpoint
 flutter pub get
 ```
 
@@ -490,7 +524,8 @@ flutter run
 - [ ] App runs on Android
 - [ ] App runs on iOS
 - [ ] Track / exclude / only buttons tested
-- [ ] Dashboard events verified (optional)
+- [ ] Default params tested (`setDefaultParam`)
+- [ ] Dashboard / HTTP endpoint events verified (optional)
 - [ ] `add` / `remove` platform flow tested (optional)
 
 ---
