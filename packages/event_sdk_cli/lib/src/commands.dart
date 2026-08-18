@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 import 'catalog.dart';
 import 'generator.dart';
 import 'pubspec_editor.dart';
+import 'native_setup.dart';
 
 Future<void> runInit({
   required String appRoot,
@@ -21,6 +22,7 @@ Future<void> runInit({
     ref: ref,
   );
   await writeSetupFile(appRoot: appRoot, platforms: specs);
+  await ensureNativeRequirements(appRoot: appRoot, platforms: specs);
   stdout.writeln(
     'Initialized Event SDK with: ${specs.map((s) => s.id).join(', ')}',
   );
@@ -48,6 +50,7 @@ Future<void> runAdd({
     ref: ref,
   );
   await writeSetupFile(appRoot: appRoot, platforms: merged);
+  await ensureNativeRequirements(appRoot: appRoot, platforms: merged);
   stdout.writeln('Enabled platforms: ${merged.map((s) => s.id).join(', ')}');
 }
 
@@ -92,6 +95,8 @@ Future<void> runDoctor({required String appRoot}) async {
   final config = File(p.join(appRoot, configRelativePath));
   final issues = <String>[];
 
+  final enabledPlatforms = await readEnabledPlatforms(appRoot);
+
   if (!pubspec.existsSync()) {
     issues.add(
       'No pubspec.yaml found. Run this command from a Flutter app root.',
@@ -110,6 +115,42 @@ Future<void> runDoctor({required String appRoot}) async {
     if (configText.contains('createFirebaseAdapter')) {
       issues.add(
         'Firebase selected: initialize Firebase before setupEventSdk() in main().',
+      );
+    }
+  }
+
+  // Native checks (Android + iOS).
+  if (enabledPlatforms.intersection({
+    'aws',
+    'adjust',
+    'firebase',
+    'amplitude',
+  }).isNotEmpty) {
+    final manifest = File(
+      p.join(appRoot, 'android/app/src/main/AndroidManifest.xml'),
+    );
+    if (!manifest.existsSync()) {
+      issues.add(
+        'Missing AndroidManifest.xml. Run `event_sdk init` again from Android project root.',
+      );
+    } else if (!manifest.readAsStringSync().contains(
+      'android.permission.INTERNET',
+    )) {
+      issues.add('Android INTERNET permission missing in AndroidManifest.xml.');
+    }
+  }
+
+  if (enabledPlatforms.contains('adjust')) {
+    final plist = File(p.join(appRoot, 'ios/Runner/Info.plist'));
+    if (!plist.existsSync()) {
+      issues.add(
+        'Missing ios/Runner/Info.plist (needed for Adjust iOS ATT text).',
+      );
+    } else if (!plist.readAsStringSync().contains(
+      'NSUserTrackingUsageDescription',
+    )) {
+      issues.add(
+        'Adjust selected: add NSUserTrackingUsageDescription to ios/Runner/Info.plist.',
       );
     }
   }
