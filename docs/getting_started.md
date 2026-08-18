@@ -34,7 +34,21 @@ dependencies:
       url: https://github.com/PranavBlob/flutter_blob_events.git
       path: packages/event_sdk_adjust
       ref: event_sdk
+
+dependency_overrides:
+  event_sdk:
+    git:
+      url: https://github.com/PranavBlob/flutter_blob_events.git
+      path: packages/event_sdk
+      ref: event_sdk
 ```
+
+The `dependency_overrides` block is required. Adapter packages depend on
+`event_sdk` via `path:`. When pub fetches them from git, it rewrites that path
+to a **commit SHA**. Your app asks for `ref: event_sdk` (the branch). Pub
+treats those as two different sources and fails with
+`event_sdk_adjust from git is forbidden`. The override forces one source.
+`event_sdk init` writes this for you.
 
 Then:
 

@@ -54,7 +54,8 @@ dart pub global activate --source git \
 If `event_sdk` is not found, add Dart global bin to your PATH (often `~/.pub-cache/bin`) and open a new terminal.
 
 After pulling the latest `event_sdk` branch, re-run this activate command so CLI
-picks up `aws_endpoint` and default-params generation.
+picks up `aws_endpoint`, default-params generation, and the `event_sdk`
+`dependency_overrides` write (required for `flutter pub get`).
 
 Verify:
 
@@ -92,11 +93,12 @@ event_sdk init --platforms aws,adjust
 The CLI will:
 
 1. Add git dependencies to `pubspec.yaml`
-2. Create `lib/generated/event_sdk_setup.g.dart` (generated — do not edit)
-3. Create `lib/event_sdk_config.dart` (credentials + `eventSdkDefaultParams` — edit TODOs)
-4. Wire generated setup to call `createEventSdkConfig()` (default params for all platforms)
-5. Add Android `INTERNET` permission
-6. Add iOS `NSUserTrackingUsageDescription` when Adjust is enabled
+2. Add `dependency_overrides` for `event_sdk` (required for git monorepo installs)
+3. Create `lib/generated/event_sdk_setup.g.dart` (generated — do not edit)
+4. Create `lib/event_sdk_config.dart` (credentials + `eventSdkDefaultParams` — edit TODOs)
+5. Wire generated setup to call `createEventSdkConfig()` (default params for all platforms)
+6. Add Android `INTERNET` permission
+7. Add iOS `NSUserTrackingUsageDescription` when Adjust is enabled
 
 Then:
 
@@ -111,11 +113,30 @@ flutter pub get
 If you see:
 
 ```text
-event_sdk_amplitude from git depends on event_sdk from hosted ...
-version solving failed
+Because every version of event_sdk_adjust from git depends on event_sdk from git
+... at <commit sha> in packages/event_sdk
+and event_sdk_demo depends on event_sdk from git ... at event_sdk in packages/event_sdk,
+event_sdk_adjust from git is forbidden.
 ```
 
-Make sure you are on the latest `event_sdk` branch (includes commit `8ef4e74` or newer), then:
+Pub is treating the **branch name** (`event_sdk`) and the **commit SHA** it
+resolved to as two different sources. Adapter packages path-depend on
+`event_sdk`; git fetch rewrites that path to the SHA.
+
+**Fix:** re-activate the CLI from the latest `event_sdk` branch, then re-run
+`event_sdk init ...` so it writes `dependency_overrides` for `event_sdk`.
+Or add this to `pubspec.yaml` yourself:
+
+```yaml
+dependency_overrides:
+  event_sdk:
+    git:
+      url: https://github.com/PranavBlob/flutter_blob_events.git
+      path: packages/event_sdk
+      ref: event_sdk
+```
+
+Then:
 
 ```bash
 flutter clean

@@ -5,6 +5,9 @@ import 'package:yaml_edit/yaml_edit.dart';
 
 import 'catalog.dart';
 
+const _eventSdkPackageName = 'event_sdk';
+const _eventSdkPackagePath = 'packages/event_sdk';
+
 Future<void> ensureCoreAndPlatformDeps({
   required String appRoot,
   required List<PlatformSpec> platforms,
@@ -16,8 +19,8 @@ Future<void> ensureCoreAndPlatformDeps({
 
   _ensureGitDep(
     editor,
-    packageName: 'event_sdk',
-    packagePath: 'packages/event_sdk',
+    packageName: _eventSdkPackageName,
+    packagePath: _eventSdkPackagePath,
     gitUrl: gitUrl,
     ref: ref,
   );
@@ -31,6 +34,18 @@ Future<void> ensureCoreAndPlatformDeps({
       ref: ref,
     );
   }
+
+  // Adapters path-depend on event_sdk. Pub rewrites those paths to a git
+  // commit SHA, which does not match `ref: event_sdk` and fails version
+  // solving. Force one source.
+  _ensureGitDep(
+    editor,
+    rootKey: 'dependency_overrides',
+    packageName: _eventSdkPackageName,
+    packagePath: _eventSdkPackagePath,
+    gitUrl: gitUrl,
+    ref: ref,
+  );
 
   await pubspecFile.writeAsString(editor.toString());
 }
@@ -57,15 +72,39 @@ Future<void> removePlatformDeps({
 
 void _ensureGitDep(
   YamlEditor editor, {
+  String rootKey = 'dependencies',
   required String packageName,
   required String packagePath,
   required String gitUrl,
   required String ref,
 }) {
-  editor.update(
-    ['dependencies', packageName],
-    {
-      'git': {'url': gitUrl, 'path': packagePath, 'ref': ref},
-    },
+  final value = _gitSource(
+    gitUrl: gitUrl,
+    packagePath: packagePath,
+    ref: ref,
   );
+
+  if (_hasPath(editor, [rootKey])) {
+    editor.update([rootKey, packageName], value);
+    return;
+  }
+
+  editor.update([rootKey], {packageName: value});
+}
+
+Map<String, Object> _gitSource({
+  required String gitUrl,
+  required String packagePath,
+  required String ref,
+}) => {
+  'git': {'url': gitUrl, 'path': packagePath, 'ref': ref},
+};
+
+bool _hasPath(YamlEditor editor, List<Object> path) {
+  try {
+    editor.parseAt(path);
+    return true;
+  } catch (_) {
+    return false;
+  }
 }

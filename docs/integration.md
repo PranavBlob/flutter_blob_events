@@ -39,7 +39,18 @@ dependencies:
       url: https://github.com/PranavBlob/flutter_blob_events.git
       path: packages/event_sdk_adjust
       ref: event_sdk
+
+dependency_overrides:
+  event_sdk:
+    git:
+      url: https://github.com/PranavBlob/flutter_blob_events.git
+      path: packages/event_sdk
+      ref: event_sdk
 ```
+
+The override is required for git monorepo installs: adapters path-depend on
+`event_sdk`, and pub rewrites those paths to a commit SHA that does not match
+`ref: event_sdk`. The CLI adds this automatically.
 
 Use **path** deps when developing against this monorepo locally:
 

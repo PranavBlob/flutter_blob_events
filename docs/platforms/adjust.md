@@ -12,6 +12,10 @@ event_sdk_adjust:
     ref: event_sdk
 ```
 
+Also depend on `event_sdk` and add a `dependency_overrides` entry for it using
+the same git url/path/ref. Pub will fail without that override. The CLI writes
+it automatically. See [Getting started](../getting_started.md).
+
 ## Config — `AdjustEventConfig`
 
 ```dart

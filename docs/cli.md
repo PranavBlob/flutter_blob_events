@@ -27,7 +27,7 @@ event_sdk init --platforms aws,adjust
 
 That command:
 
-1. Adds `event_sdk`, `event_sdk_aws`, and `event_sdk_adjust` git dependencies
+1. Adds `event_sdk`, `event_sdk_aws`, and `event_sdk_adjust` git dependencies, plus a `dependency_overrides` entry for `event_sdk` (so pub does not treat the branch ref and the adapters' rewritten commit SHA as different sources)
 2. Creates `lib/generated/event_sdk_setup.g.dart`
 3. Creates **your editable** `lib/event_sdk_config.dart`
 4. Updates native host app requirements:
@@ -74,6 +74,7 @@ event_sdk init --platforms aws,adjust \
 Creates / updates:
 
 - Git deps in `pubspec.yaml` for `event_sdk` + selected platforms
+- `dependency_overrides.event_sdk` (same git url/path/ref) so `flutter pub get` succeeds
 - generated entrypoint: `lib/generated/event_sdk_setup.g.dart`
 - app-owned credentials/config: `lib/event_sdk_config.dart`
 - native host app requirements (Android/iOS)

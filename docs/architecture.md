@@ -68,6 +68,7 @@ Default params live in the host app’s `lib/event_sdk_config.dart` (`eventSdkDe
 ## Distribution
 
 - **Git** deps with `path:` inside the monorepo (`ref: event_sdk` branch by default)
+- Consuming apps must `dependency_overrides` `event_sdk` to the same git source (CLI writes this) because pub rewrites adapter `path:` deps to a commit SHA
 - Local contributors use Melos / Dart workspace `path` resolution
 - Not published to pub.dev (`publish_to: none`)
 

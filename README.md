@@ -75,9 +75,18 @@ dependencies:
       url: https://github.com/PranavBlob/flutter_blob_events.git
       path: packages/event_sdk_adjust
       ref: event_sdk
+
+# Required: adapters path-depend on event_sdk. Pub rewrites those paths to a
+# commit SHA, which does not match `ref: event_sdk` unless you override.
+dependency_overrides:
+  event_sdk:
+    git:
+      url: https://github.com/PranavBlob/flutter_blob_events.git
+      path: packages/event_sdk
+      ref: event_sdk
 ```
 
-Replace the git URL/ref with your real remote when ready.
+Replace the git URL/ref with your real remote when ready. The CLI writes this override for you.
 
 ### Init manually in `main`
 

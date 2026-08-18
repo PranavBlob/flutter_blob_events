@@ -17,6 +17,9 @@ event_sdk_aws:
     ref: event_sdk
 ```
 
+Also depend on `event_sdk` and add a `dependency_overrides` entry for it using
+the same git url/path/ref. See [Getting started](../getting_started.md).
+
 Pulls in (transitively): `amplify_flutter`, `amplify_analytics_pinpoint`, `amplify_auth_cognito`.
 
 ## Config — `AwsPinpointConfig`

@@ -21,6 +21,9 @@ aws_endpoint_sdk:
     ref: event_sdk
 ```
 
+Also depend on `event_sdk` and add a `dependency_overrides` entry for it using
+the same git url/path/ref. See [Getting started](../getting_started.md).
+
 ## CLI
 
 ```bash
